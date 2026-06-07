@@ -19,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,28 +31,30 @@ import androidx.compose.ui.unit.sp
 import com.karulann.anneofgreengablesfullseriesebook.data.assets.SampleChapters
 import com.karulann.anneofgreengablesfullseriesebook.domain.model.Book
 import com.karulann.anneofgreengablesfullseriesebook.domain.model.Chapter
+import com.karulann.anneofgreengablesfullseriesebook.domain.model.ReaderSettings
 import com.karulann.anneofgreengablesfullseriesebook.domain.model.ReaderThemeMode
 
 @Composable
 fun ReaderScreen(
     book: Book,
+    readerSettings: ReaderSettings,
     chapters: List<Chapter> = SampleChapters.getChaptersForBook(book.id),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onFontSizeChange: (Float) -> Unit,
+    onLineSpacingChange: (Float) -> Unit,
+    onThemeChange: (ReaderThemeMode) -> Unit
 ) {
     var chapterIndex by remember(book.id) { mutableStateOf(0) }
-    var fontSizeSp by remember { mutableFloatStateOf(18f) }
-    var lineSpacingMultiplier by remember { mutableFloatStateOf(1.6f) }
-    var readerThemeMode by remember { mutableStateOf(ReaderThemeMode.LIGHT) }
 
     val currentChapter = chapters.getOrNull(chapterIndex)
 
-    val backgroundColor = when (readerThemeMode) {
+    val backgroundColor = when (readerSettings.themeMode) {
         ReaderThemeMode.LIGHT -> MaterialTheme.colorScheme.background
         ReaderThemeMode.SEPIA -> Color(0xFFF4ECD8)
         ReaderThemeMode.DARK -> Color(0xFF121212)
     }
 
-    val textColor = when (readerThemeMode) {
+    val textColor = when (readerSettings.themeMode) {
         ReaderThemeMode.LIGHT -> MaterialTheme.colorScheme.onBackground
         ReaderThemeMode.SEPIA -> Color(0xFF3B2F2F)
         ReaderThemeMode.DARK -> Color(0xFFEAEAEA)
@@ -91,32 +92,22 @@ fun ReaderScreen(
                 )
 
                 ReaderControls(
-                    fontSizeSp = fontSizeSp,
-                    lineSpacingMultiplier = lineSpacingMultiplier,
-                    readerThemeMode = readerThemeMode,
+                    fontSizeSp = readerSettings.fontSizeSp,
+                    lineSpacingMultiplier = readerSettings.lineSpacingMultiplier,
+                    readerThemeMode = readerSettings.themeMode,
                     onDecreaseFont = {
-                        if (fontSizeSp > 14f) {
-                            fontSizeSp -= 2f
-                        }
+                        onFontSizeChange(readerSettings.fontSizeSp - 2f)
                     },
                     onIncreaseFont = {
-                        if (fontSizeSp < 32f) {
-                            fontSizeSp += 2f
-                        }
+                        onFontSizeChange(readerSettings.fontSizeSp + 2f)
                     },
                     onDecreaseSpacing = {
-                        if (lineSpacingMultiplier > 1.2f) {
-                            lineSpacingMultiplier -= 0.2f
-                        }
+                        onLineSpacingChange(readerSettings.lineSpacingMultiplier - 0.2f)
                     },
                     onIncreaseSpacing = {
-                        if (lineSpacingMultiplier < 2.2f) {
-                            lineSpacingMultiplier += 0.2f
-                        }
+                        onLineSpacingChange(readerSettings.lineSpacingMultiplier + 0.2f)
                     },
-                    onThemeChange = { selectedTheme ->
-                        readerThemeMode = selectedTheme
-                    }
+                    onThemeChange = onThemeChange
                 )
 
                 Column(
@@ -127,8 +118,8 @@ fun ReaderScreen(
                 ) {
                     Text(
                         text = currentChapter.content,
-                        fontSize = fontSizeSp.sp,
-                        lineHeight = (fontSizeSp * lineSpacingMultiplier).sp,
+                        fontSize = readerSettings.fontSizeSp.sp,
+                        lineHeight = (readerSettings.fontSizeSp * readerSettings.lineSpacingMultiplier).sp,
                         color = textColor,
                         style = MaterialTheme.typography.bodyLarge
                     )

@@ -8,6 +8,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import com.karulann.anneofgreengablesfullseriesebook.data.settings.ReaderSettingsRepository
+import com.karulann.anneofgreengablesfullseriesebook.domain.model.ReaderSettings
+import kotlinx.coroutines.launch
 import com.karulann.anneofgreengablesfullseriesebook.data.assets.SampleBooks
 import com.karulann.anneofgreengablesfullseriesebook.feature.bookdetail.BookDetailScreen
 import com.karulann.anneofgreengablesfullseriesebook.feature.home.HomeScreen
@@ -21,6 +26,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AnneOfGreenGablesFullSeriesEbookTheme {
+                val readerSettingsRepository = remember {
+                    ReaderSettingsRepository(applicationContext)
+                }
+
+                val readerSettings by readerSettingsRepository.readerSettingsFlow.collectAsState(
+                    initial = ReaderSettings()
+                )
+
+                val coroutineScope = rememberCoroutineScope()
+
                 var selectedBookId by remember { mutableStateOf<String?>(null) }
                 var isReading by remember { mutableStateOf(false) }
 
@@ -40,8 +55,24 @@ class MainActivity : ComponentActivity() {
                 } else if (isReading) {
                     ReaderScreen(
                         book = selectedBook,
+                        readerSettings = readerSettings,
                         onBackClick = {
                             isReading = false
+                        },
+                        onFontSizeChange = { newFontSize ->
+                            coroutineScope.launch {
+                                readerSettingsRepository.updateFontSize(newFontSize)
+                            }
+                        },
+                        onLineSpacingChange = { newLineSpacing ->
+                            coroutineScope.launch {
+                                readerSettingsRepository.updateLineSpacing(newLineSpacing)
+                            }
+                        },
+                        onThemeChange = { newTheme ->
+                            coroutineScope.launch {
+                                readerSettingsRepository.updateThemeMode(newTheme)
+                            }
                         }
                     )
                 } else {
