@@ -12,6 +12,7 @@ import com.karulann.anneofgreengablesfullseriesebook.data.assets.SampleBooks
 import com.karulann.anneofgreengablesfullseriesebook.feature.bookdetail.BookDetailScreen
 import com.karulann.anneofgreengablesfullseriesebook.feature.home.HomeScreen
 import com.karulann.anneofgreengablesfullseriesebook.ui.theme.AnneOfGreenGablesFullSeriesEbookTheme
+import com.karulann.anneofgreengablesfullseriesebook.feature.reader.ReaderScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AnneOfGreenGablesFullSeriesEbookTheme {
                 var selectedBookId by remember { mutableStateOf<String?>(null) }
+                var isReading by remember { mutableStateOf(false) }
 
                 val selectedBook = selectedBookId?.let { id ->
                     SampleBooks.books.firstOrNull { book ->
@@ -32,6 +34,14 @@ class MainActivity : ComponentActivity() {
                     HomeScreen(
                         onBookClick = { book ->
                             selectedBookId = book.id
+                            isReading = false
+                        }
+                    )
+                } else if (isReading) {
+                    ReaderScreen(
+                        book = selectedBook,
+                        onBackClick = {
+                            isReading = false
                         }
                     )
                 } else {
@@ -39,9 +49,10 @@ class MainActivity : ComponentActivity() {
                         book = selectedBook,
                         onBackClick = {
                             selectedBookId = null
+                            isReading = false
                         },
                         onStartReadingClick = {
-                            // Reader screen will be added in the next step.
+                            isReading = true
                         }
                     )
                 }
