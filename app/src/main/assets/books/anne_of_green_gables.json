@@ -1,0 +1,24 @@
+{
+  "id": "anne_of_green_gables",
+  "title": "Anne of Green Gables",
+  "author": "L. M. Montgomery",
+  "year": 1908,
+  "source": "Project Gutenberg",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Mrs. Rachel Lynde Is Surprised",
+      "content": "This is temporary test content for Chapter 1. Later, this will be replaced with the cleaned Project Gutenberg text.\n\nThis paragraph is used to confirm that line breaks display correctly in the reader."
+    },
+    {
+      "number": 2,
+      "title": "Matthew Cuthbert Is Surprised",
+      "content": "This is temporary test content for Chapter 2. The purpose is to test chapter navigation and reading progress.\n\nIf this chapter appears when pressing Next, the JSON structure is working."
+    },
+    {
+      "number": 3,
+      "title": "Marilla Cuthbert Is Surprised",
+      "content": "This is temporary test content for Chapter 3. The final app will load real book chapters from this same JSON structure.\n\nThis keeps the reader system simple and offline first."
+    }
+  ]
+}
