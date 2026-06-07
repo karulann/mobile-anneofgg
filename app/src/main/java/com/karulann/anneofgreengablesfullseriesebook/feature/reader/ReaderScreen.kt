@@ -43,13 +43,17 @@ import com.karulann.anneofgreengablesfullseriesebook.domain.model.ReaderThemeMod
 fun ReaderScreen(
     book: Book,
     readerSettings: ReaderSettings,
+    initialChapterIndex: Int,
     chapters: List<Chapter> = SampleChapters.getChaptersForBook(book.id),
     onBackClick: () -> Unit,
+    onChapterChange: (Int) -> Unit,
     onFontSizeChange: (Float) -> Unit,
     onLineSpacingChange: (Float) -> Unit,
     onThemeChange: (ReaderThemeMode) -> Unit
 ) {
-    var chapterIndex by remember(book.id) { mutableStateOf(0) }
+    var chapterIndex by remember(book.id, initialChapterIndex) {
+        mutableStateOf(initialChapterIndex.coerceIn(0, chapters.lastIndex.coerceAtLeast(0)))
+    }
     var showSettings by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -123,11 +127,13 @@ fun ReaderScreen(
                     onPreviousClick = {
                         if (chapterIndex > 0) {
                             chapterIndex--
+                            onChapterChange(chapterIndex)
                         }
                     },
                     onNextClick = {
                         if (chapterIndex < chapters.lastIndex) {
                             chapterIndex++
+                            onChapterChange(chapterIndex)
                         }
                     }
                 )
