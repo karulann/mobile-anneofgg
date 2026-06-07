@@ -37,6 +37,8 @@ import com.karulann.anneofgreengablesfullseriesebook.domain.model.Book
 import com.karulann.anneofgreengablesfullseriesebook.domain.model.Chapter
 import com.karulann.anneofgreengablesfullseriesebook.domain.model.ReaderSettings
 import com.karulann.anneofgreengablesfullseriesebook.domain.model.ReaderThemeMode
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextIndent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,13 +114,28 @@ fun ReaderScreen(
                         .verticalScroll(rememberScrollState())
                         .padding(top = 16.dp)
                 ) {
-                    Text(
-                        text = currentChapter.content,
-                        fontSize = readerSettings.fontSizeSp.sp,
-                        lineHeight = (readerSettings.fontSizeSp * readerSettings.lineSpacingMultiplier).sp,
-                        color = textColor,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    val paragraphs = currentChapter.content
+                        .split(Regex("\\n\\s*\\n"))
+                        .map { paragraph -> paragraph.trim() }
+                        .filter { paragraph -> paragraph.isNotBlank() }
+
+                    paragraphs.forEachIndexed { index, paragraph ->
+                        Text(
+                            text = paragraph,
+                            fontSize = readerSettings.fontSizeSp.sp,
+                            lineHeight = (readerSettings.fontSizeSp * readerSettings.lineSpacingMultiplier).sp,
+                            color = textColor,
+                            textAlign = TextAlign.Justify,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                textIndent = TextIndent(
+                                    firstLine = 24.sp
+                                )
+                            ),
+                            modifier = Modifier.padding(
+                                bottom = if (index == paragraphs.lastIndex) 0.dp else 16.dp
+                            )
+                        )
+                    }
                 }
 
                 ReaderChapterNavigation(
