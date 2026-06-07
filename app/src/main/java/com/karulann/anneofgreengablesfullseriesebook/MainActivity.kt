@@ -20,6 +20,8 @@ import com.karulann.anneofgreengablesfullseriesebook.feature.home.HomeScreen
 import com.karulann.anneofgreengablesfullseriesebook.feature.reader.ReaderScreen
 import com.karulann.anneofgreengablesfullseriesebook.ui.theme.AnneOfGreenGablesFullSeriesEbookTheme
 import kotlinx.coroutines.launch
+import com.karulann.anneofgreengablesfullseriesebook.data.assets.BookAssetRepository
+import com.karulann.anneofgreengablesfullseriesebook.data.assets.SampleChapters
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +38,10 @@ class MainActivity : ComponentActivity() {
                     ReadingProgressRepository(applicationContext)
                 }
 
+                val bookAssetRepository = remember {
+                    BookAssetRepository(applicationContext)
+                }
+
                 val readerSettings by readerSettingsRepository.readerSettingsFlow.collectAsState(
                     initial = ReaderSettings()
                 )
@@ -49,6 +55,13 @@ class MainActivity : ComponentActivity() {
                     SampleBooks.books.firstOrNull { book ->
                         book.id == id
                     }
+                }
+
+                val selectedChapters = remember(selectedBook?.id) {
+                    selectedBook?.let { book ->
+                        bookAssetRepository.loadBookContent(book.id)?.chapters
+                            ?: SampleChapters.getChaptersForBook(book.id)
+                    } ?: emptyList()
                 }
 
                 var lastChapterIndex by remember(selectedBook?.id) {
@@ -79,6 +92,7 @@ class MainActivity : ComponentActivity() {
                         book = selectedBook,
                         readerSettings = readerSettings,
                         initialChapterIndex = lastChapterIndex,
+                        chapters = selectedChapters,
                         onBackClick = {
                             isReading = false
                         },
