@@ -42,6 +42,10 @@ class MainActivity : ComponentActivity() {
                     BookAssetRepository(applicationContext)
                 }
 
+                val availableBooks = remember {
+                    bookAssetRepository.loadBookCatalog()
+                }
+
                 val readerSettings by readerSettingsRepository.readerSettingsFlow.collectAsState(
                     initial = ReaderSettings()
                 )
@@ -52,7 +56,7 @@ class MainActivity : ComponentActivity() {
                 var isReading by remember { mutableStateOf(false) }
 
                 val selectedBook = selectedBookId?.let { id ->
-                    SampleBooks.books.firstOrNull { book ->
+                    availableBooks.firstOrNull { book ->
                         book.id == id
                     }
                 }
@@ -82,6 +86,7 @@ class MainActivity : ComponentActivity() {
 
                 if (selectedBook == null) {
                     HomeScreen(
+                        books = availableBooks,
                         onBookClick = { book ->
                             selectedBookId = book.id
                             isReading = false
