@@ -4,16 +4,47 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.karulann.anneofgreengablesfullseriesebook.ui.theme.AnneOfGreenGablesFullSeriesEbookTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.karulann.anneofgreengablesfullseriesebook.data.assets.SampleBooks
+import com.karulann.anneofgreengablesfullseriesebook.feature.bookdetail.BookDetailScreen
 import com.karulann.anneofgreengablesfullseriesebook.feature.home.HomeScreen
+import com.karulann.anneofgreengablesfullseriesebook.ui.theme.AnneOfGreenGablesFullSeriesEbookTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             AnneOfGreenGablesFullSeriesEbookTheme {
-                HomeScreen()
+                var selectedBookId by remember { mutableStateOf<String?>(null) }
+
+                val selectedBook = selectedBookId?.let { id ->
+                    SampleBooks.books.firstOrNull { book ->
+                        book.id == id
+                    }
+                }
+
+                if (selectedBook == null) {
+                    HomeScreen(
+                        onBookClick = { book ->
+                            selectedBookId = book.id
+                        }
+                    )
+                } else {
+                    BookDetailScreen(
+                        book = selectedBook,
+                        onBackClick = {
+                            selectedBookId = null
+                        },
+                        onStartReadingClick = {
+                            // Reader screen will be added in the next step.
+                        }
+                    )
+                }
             }
         }
     }
